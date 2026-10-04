@@ -1,0 +1,222 @@
+if not game:IsLoaded() then game.Loaded:Wait() end
+
+local TeleportService = game:GetService("TeleportService")
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+local char = LocalPlayer.Character
+
+queue_on_teleport([[
+    loadstring(game:HttpGet("https://pastebin.com/raw/vNYaRykx"))()
+]])
+
+-- miles078859
+print("scarletboy29273 and Blueboy929206")
+
+-- Check if exists
+for _, gui in pairs(game.CoreGui:GetChildren()) do
+    if gui.Name == "PiggyGui" then
+        gui:Destroy()
+    end
+end
+
+
+-- Create PiggyGui
+local PiggyGui = Instance.new("ScreenGui")
+PiggyGui.Name = "PiggyGui"
+PiggyGui.Parent = game.CoreGui
+
+-- Create ScrollingFrame
+local ScrollingFrame = Instance.new("ScrollingFrame", PiggyGui)
+ScrollingFrame.BackgroundColor3 = Color3.new(0.15, 0.15, 0.15)
+ScrollingFrame.Position = UDim2.new(0.0800000057, 0, 0.5, 0)  -- Move to the right
+ScrollingFrame.Size = UDim2.new(0, 300, 0, 400)  -- Larger size
+ScrollingFrame.Visible =  false  -- Initially hidden
+ScrollingFrame.AutomaticCanvasSize = Enum.AutomaticSize.Y
+ScrollingFrame.CanvasSize = UDim2.new(0, 0, 0, 0) -- Required fallback
+ScrollingFrame.Active = true
+
+
+-- Make ScrollingFrame draggable
+local draggingFrame
+local dragInputFrame
+local dragStartFrame
+local startPosFrame
+
+local function updateFrame(input)
+    local delta = input.Position - dragStartFrame
+    ScrollingFrame.Position = UDim2.new(startPosFrame.X.Scale, startPosFrame.X.Offset + delta.X, startPosFrame.Y.Scale, startPosFrame.Y.Offset + delta.Y)
+end
+
+ScrollingFrame.InputBegan:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+        draggingFrame = true
+        dragStartFrame = input.Position
+        startPosFrame = ScrollingFrame.Position
+
+        input.Changed:Connect(function()
+            if input.UserInputState == Enum.UserInputState.End then
+                draggingFrame = false
+            end
+        end)
+    end
+end)
+
+ScrollingFrame.InputChanged:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then
+        dragInputFrame = input
+    end
+end)
+
+game:GetService("UserInputService").InputChanged:Connect(function(input)
+    if input == dragInputFrame and draggingFrame then
+        updateFrame(input)
+    end
+end)
+
+
+-- Print Path
+local function getFullPath(instance)
+	local path = instance.Name
+	local parent = instance.Parent
+	while parent and parent ~= game do
+		path = parent.Name .. "." .. path
+		parent = parent.Parent
+	end
+	return path
+end
+
+-- Create Toggle Button
+local ToggleButton = Instance.new("TextButton", PiggyGui)
+ToggleButton.Name = "ToggleButton"
+ToggleButton.Size = UDim2.new(0, 70, 0, 70)
+ToggleButton.Position = UDim2.new(0.5, -25, 0.5, -25)  -- Center of the screen
+ToggleButton.Text = "ITEMS"
+ToggleButton.BackgroundColor3 = Color3.new(0.4, 0.4, 0.2)
+ToggleButton.TextColor3 = Color3.new(1, 1, 1)
+ToggleButton.Active = true
+ToggleButton.BorderSizePixel = 0
+ToggleButton.BackgroundTransparency = 0.5
+ToggleButton.ClipsDescendants = true
+
+-- Make ToggleButton draggable
+local draggingToggle
+local dragInputToggle
+local dragStartToggle
+local startPosToggle
+
+local function updateToggle(input)
+    local delta = input.Position - dragStartToggle
+    ToggleButton.Position = UDim2.new(startPosToggle.X.Scale, startPosToggle.X.Offset + delta.X, startPosToggle.Y.Scale, startPosToggle.Y.Offset + delta.Y)
+end
+
+ToggleButton.InputBegan:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+        draggingToggle = true
+        dragStartToggle = input.Position
+        startPosToggle = ToggleButton.Position
+
+        input.Changed:Connect(function()
+            if input.UserInputState == Enum.UserInputState.End then
+                draggingToggle = false
+            end
+        end)
+    end
+end)
+
+ToggleButton.InputChanged:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then
+        dragInputToggle = input
+    end
+end)
+
+game:GetService("UserInputService").InputChanged:Connect(function(input)
+    if input == dragInputToggle and draggingToggle then
+        updateToggle(input)
+    end
+end)
+
+-- Toggle ScrollingFrame visibility
+ToggleButton.MouseButton1Click:Connect(function()
+    ScrollingFrame.Visible = not ScrollingFrame.Visible
+end)
+
+-- Create UIGridLayout
+local UIGridLayout = Instance.new("UIGridLayout", ScrollingFrame)
+UIGridLayout.CellSize = UDim2.new(0, 90, 0, 90)
+
+-- Update items periodically
+while wait(1) do
+    if ScrollingFrame.Visible then
+        local items = {}
+        local itemframes = ScrollingFrame:GetChildren()
+
+        -- Clear existing item frames
+        for _, frame in ipairs(itemframes) do
+            if frame.ClassName == "TextButton" and frame.Name ~= "ToggleButton" then
+                frame:Destroy()
+            end
+        end
+        -- Find items to display
+      for _, obj in ipairs(workspace:GetDescendants()) do
+    if obj:IsA("Script") then
+        local parent = obj.Parent
+        local grandparent = parent and parent.Parent
+        if parent:FindFirstChildOfClass("ClickDetector") and
+           not parent:FindFirstChildOfClass("Folder") and
+           not grandparent:FindFirstChildOfClass("Script") and
+           not parent:FindFirstChildOfClass("IntValue") and
+           not parent:FindFirstChildOfClass("StringValue") and
+           not parent:FindFirstChildOfClass("BoolValue") and
+           not parent:FindFirstAncestorOfClass("TouchTransmitter") and
+           not parent:FindFirstChildOfClass("Sound") and
+           not parent:FindFirstChildOfClass("SurfaceGui") and
+           grandparent.Name ~= "ItemHeld" and
+           parent.Transparency ~= 1 then
+            table.insert(items, parent)
+        end
+    end
+end
+
+
+        -- Create new item frames
+        for _, item in ipairs(items) do
+            local ItemFrame = Instance.new("TextButton", ScrollingFrame)
+            ItemFrame.Name = "ItemFrame"
+            ItemFrame.BackgroundColor3 = Color3.new(1, 1, 1)
+            ItemFrame.BackgroundTransparency = 0.95
+            ItemFrame.Size = UDim2.new(0, 100, 0, 100)
+            ItemFrame.Text = ""
+
+            local View = Instance.new("ViewportFrame", ItemFrame)
+            View.Name = "View"
+            View.Size = UDim2.new(1, 0, 1, 0)
+            View.BackgroundTransparency = 1
+            View.BorderSizePixel = 0
+
+            local viewportclone = item:Clone()
+            viewportclone.Parent = View
+
+            local cam = Instance.new("Camera", View)
+            cam.CameraType = Enum.CameraType.Fixed
+            local objectPosition = item.Position
+            local cameraPosition = objectPosition + Vector3.new(0, 3, 0)
+            cam.CFrame = CFrame.new(cameraPosition, objectPosition)
+            View.CurrentCamera = cam
+
+            ItemFrame.MouseButton1Down:Connect(function()
+				if item:FindFirstChildOfClass("ClickDetector") then
+					print(getFullPath(item))
+					if char and char:FindFirstChild("HumanoidRootPart") then
+						local originalCFrame = char.HumanoidRootPart.CFrame
+						task.wait(0.2)
+				    	char:PivotTo(item.CFrame)
+						task.wait(0.2)
+						fireclickdetector(item:FindFirstChildOfClass("ClickDetector"))
+						task.wait(0.3)
+						char:PivotTo(originalCFrame)
+					end
+				end
+			end)
+		end
+	end
+end
